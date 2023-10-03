@@ -22,6 +22,9 @@ type Site struct {
 func getSites() ([]Site, error) {
 	var out []Site
 	rurl := fmt.Sprintf("%s/sites", _oreConfig.Services.DiscoveryURL)
+	if verbose > 0 {
+		fmt.Println("HTTP GET", rurl)
+	}
 	resp, err := http.Get(rurl)
 	if err != nil {
 		return out, err

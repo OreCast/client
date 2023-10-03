@@ -30,6 +30,9 @@ type MetaDataRecord struct {
 func metadata(site string) MetaDataRecord {
 	var results MetaDataRecord
 	rurl := fmt.Sprintf("%s/meta/%s", _oreConfig.Services.MetaDataURL, site)
+	if verbose > 0 {
+		fmt.Println("HTTP GET", rurl)
+	}
 	resp, err := http.Get(rurl)
 	if err != nil {
 		log.Println("ERROR:", err)
