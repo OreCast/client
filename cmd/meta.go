@@ -71,18 +71,23 @@ func getMeta(site string) ([]MetaData, error) {
 	return records, nil
 }
 
+// helper function to provide usage of meta option
+func metaUsage() {
+	fmt.Println("orecast meta <ls|add|rm> [value]")
+}
+
 // helper function to add meta data record
-func addRecord(args []string) {
+func metaAddRecord(args []string) {
 	fmt.Printf("addRecord with %+v", args)
 }
 
 // helper function to delete meta-data record
-func deleteRecord(args []string) {
+func metaDeleteRecord(args []string) {
 	fmt.Printf("deleteRecord with %+v", args)
 }
 
 // helper funtion to list meta-data records
-func listRecords(site string) {
+func metaListRecord(site string) {
 	records, err := getMeta(site)
 	if err != nil {
 		fmt.Println("ERROR", err)
@@ -97,11 +102,6 @@ func listRecords(site string) {
 	}
 }
 
-// helper function to provide usage of meta option
-func usage() {
-	fmt.Println("orecast meta <ls|add|rm> [value]")
-}
-
 func metaCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "meta",
@@ -111,24 +111,24 @@ func metaCommand() *cobra.Command {
 		Args: cobra.MinimumNArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) == 0 {
-				usage()
+				metaUsage()
 			} else if args[0] == "ls" {
 				if len(args) == 2 {
-					listRecords(args[1])
+					metaListRecord(args[1])
 				} else {
-					listRecords("")
+					metaListRecord("")
 				}
 			} else if args[0] == "add" {
-				addRecord(args)
+				metaAddRecord(args)
 			} else if args[0] == "rm" {
-				deleteRecord(args)
+				metaDeleteRecord(args)
 			} else {
 				fmt.Printf("WARNING: unsupported option(s) %+v", args)
 			}
 		},
 	}
 	cmd.SetUsageFunc(func(*cobra.Command) error {
-		usage()
+		metaUsage()
 		return nil
 	})
 	return cmd

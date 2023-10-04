@@ -38,24 +38,61 @@ func getSites() ([]Site, error) {
 	return results, nil
 }
 
+// helper function to provide usage of site option
+func siteUsage() {
+	fmt.Println("orecast site <ls|add|rm> [value]")
+}
+
+// helper function to add site data record
+func siteAddRecord(args []string) {
+	fmt.Printf("addRecord with %+v", args)
+}
+
+// helper function to delete site-data record
+func siteDeleteRecord(args []string) {
+	fmt.Printf("deleteRecord with %+v", args)
+}
+
+// helper funciont to list site record(s)
+func siteListRecord(site string) {
+	if sites, err := getSites(); err == nil {
+		for _, s := range sites {
+			fmt.Println("---")
+			fmt.Printf("Name       : %s\n", s.Name)
+			fmt.Printf("URL        : %s\n", s.URL)
+			fmt.Printf("Description: %s\n", s.Description)
+		}
+	}
+}
+
 func siteCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "site",
 		Short: "OreCast site command",
 		Long: `OreCast site command
                 Complete documentation is available at https://orecast.com/documentation/`,
+		Args: cobra.MinimumNArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			if sites, err := getSites(); err == nil {
-				for _, s := range sites {
-					fmt.Println("---")
-					fmt.Printf("Name       : %s\n", s.Name)
-					fmt.Printf("URL        : %s\n", s.URL)
-					fmt.Printf("Description: %s\n", s.Description)
+			if len(args) == 0 {
+				siteUsage()
+			} else if args[0] == "ls" {
+				if len(args) == 2 {
+					siteListRecord(args[1])
+				} else {
+					siteListRecord("")
 				}
+			} else if args[0] == "add" {
+				siteAddRecord(args)
+			} else if args[0] == "rm" {
+				siteDeleteRecord(args)
 			} else {
-				fmt.Println("ERROR", err)
+				fmt.Printf("WARNING: unsupported option(s) %+v", args)
 			}
 		},
 	}
+	cmd.SetUsageFunc(func(*cobra.Command) error {
+		siteUsage()
+		return nil
+	})
 	return cmd
 }
