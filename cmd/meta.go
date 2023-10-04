@@ -8,9 +8,14 @@ import (
 	"net/http"
 	"os"
 
-	oreConfig "github.com/OreCast/common/config"
 	"github.com/spf13/cobra"
 )
+
+// Response represences response from MetaData service
+type Response struct {
+	Status string `json:"status"`
+	Error  any    `json:"error,omitempty"`
+}
 
 // helper function to get metadata
 // MetaData represents MetaData object returned from discovery service
@@ -31,7 +36,7 @@ type MetaDataRecord struct {
 // helper function to fetch sites info from discovery service
 func metadata(site string) MetaDataRecord {
 	var results MetaDataRecord
-	rurl := fmt.Sprintf("%s/meta/%s", oreConfig.Config.Services.MetaDataURL, site)
+	rurl := fmt.Sprintf("%s/meta/%s", _oreConfig.Services.MetaDataURL, site)
 	if verbose > 0 {
 		fmt.Println("HTTP GET", rurl)
 	}
@@ -95,7 +100,7 @@ func metaDeleteRecord(args []string) {
 		fmt.Println("ERROR", err)
 		os.Exit(1)
 	}
-	rurl := fmt.Sprintf("%s/meta/%s", oreConfig.Config.Services.MetaDataURL, mid)
+	rurl := fmt.Sprintf("%s/meta/%s", _oreConfig.Services.MetaDataURL, mid)
 	req, err := http.NewRequest("DELETE", rurl, nil)
 	if err != nil {
 		fmt.Println("ERROR", err)
@@ -110,7 +115,22 @@ func metaDeleteRecord(args []string) {
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
-	fmt.Printf("Response: %s, error %v", string(body), err)
+	if err != nil {
+		fmt.Println("ERROR", err)
+		os.Exit(1)
+	}
+	var response Response
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		fmt.Println("ERROR", err, "response body", string(body))
+		os.Exit(1)
+	}
+	if response.Status == "ok" {
+		fmt.Printf("SUCCESS: record %s was successfully removed\n", mid)
+	} else {
+		fmt.Printf("WARNING: record %s failed to be removed\n", mid)
+	}
+
 }
 
 // helper funtion to list meta-data records
