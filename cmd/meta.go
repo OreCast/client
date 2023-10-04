@@ -3,10 +3,12 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
 
+	oreConfig "github.com/OreCast/common/config"
 	"github.com/spf13/cobra"
 )
 
@@ -29,7 +31,7 @@ type MetaDataRecord struct {
 // helper function to fetch sites info from discovery service
 func metadata(site string) MetaDataRecord {
 	var results MetaDataRecord
-	rurl := fmt.Sprintf("%s/meta/%s", _oreConfig.Services.MetaDataURL, site)
+	rurl := fmt.Sprintf("%s/meta/%s", oreConfig.Config.Services.MetaDataURL, site)
 	if verbose > 0 {
 		fmt.Println("HTTP GET", rurl)
 	}
@@ -83,7 +85,32 @@ func metaAddRecord(args []string) {
 
 // helper function to delete meta-data record
 func metaDeleteRecord(args []string) {
-	fmt.Printf("deleteRecord with %+v", args)
+	if len(args) != 2 {
+		metaUsage()
+		os.Exit(1)
+	}
+	mid := args[1]
+	token, err := accessToken()
+	if err != nil {
+		fmt.Println("ERROR", err)
+		os.Exit(1)
+	}
+	rurl := fmt.Sprintf("%s/meta/%s", oreConfig.Config.Services.MetaDataURL, mid)
+	req, err := http.NewRequest("DELETE", rurl, nil)
+	if err != nil {
+		fmt.Println("ERROR", err)
+		os.Exit(1)
+	}
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("ERROR", err)
+		os.Exit(1)
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	fmt.Printf("Response: %s, error %v", string(body), err)
 }
 
 // helper funtion to list meta-data records

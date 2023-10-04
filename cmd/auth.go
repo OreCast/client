@@ -137,6 +137,13 @@ func passwordPrompt(label string) string {
 	return s
 }
 
+// helper function to get access token
+func accessToken() (string, error) {
+	user := inputPrompt("OreCast username:")
+	pass := passwordPrompt("OreCast password:")
+	return getToken(user, pass)
+}
+
 func authCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "token",
@@ -144,9 +151,7 @@ func authCommand() *cobra.Command {
 		Long: `OreCast token command
                 Complete documentation is available at https://orecast.com/documentation/`,
 		Run: func(cmd *cobra.Command, args []string) {
-			user := inputPrompt("OreCast username:")
-			pass := passwordPrompt("OreCast password:")
-			if token, err := getToken(user, pass); err == nil {
+			if token, err := accessToken(); err == nil {
 				fmt.Println(token)
 			} else {
 				fmt.Println("ERROR", err)
