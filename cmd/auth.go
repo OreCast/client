@@ -1,16 +1,21 @@
 package cmd
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"strings"
+	"syscall"
 
 	authz "github.com/OreCast/common/authz"
 	jwt "github.com/golang-jwt/jwt/v4"
 	"github.com/spf13/cobra"
+	term "golang.org/x/term"
 )
 
 // User represents structure used by users DB in Authz service to handle incoming requests
@@ -103,6 +108,35 @@ func getToken(login, pass string) (string, error) {
 	return reqToken, nil
 }
 
+// helper function to get user input
+func inputPrompt(label string) string {
+	var s string
+	r := bufio.NewReader(os.Stdin)
+	for {
+		fmt.Fprint(os.Stderr, label+" ")
+		s, _ = r.ReadString('\n')
+		if s != "" {
+			break
+		}
+	}
+	return strings.TrimSpace(s)
+}
+
+// helper function to get user password
+func passwordPrompt(label string) string {
+	var s string
+	for {
+		fmt.Fprint(os.Stderr, label+" ")
+		pw, _ := term.ReadPassword(int(syscall.Stdin))
+		s = string(pw)
+		if s != "" {
+			break
+		}
+	}
+	fmt.Println()
+	return s
+}
+
 func authCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "token",
@@ -110,8 +144,8 @@ func authCommand() *cobra.Command {
 		Long: `OreCast token command
                 Complete documentation is available at https://orecast.com/documentation/`,
 		Run: func(cmd *cobra.Command, args []string) {
-			user := "test"
-			pass := "test"
+			user := inputPrompt("OreCast username:")
+			pass := passwordPrompt("OreCast password:")
 			if token, err := getToken(user, pass); err == nil {
 				fmt.Println(token)
 			} else {
