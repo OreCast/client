@@ -54,7 +54,7 @@ func getMeta(site string) ([]MetaData, error) {
 		return records, err
 	}
 	for _, sobj := range sites {
-		if site == sobj.Name {
+		if site == sobj.Name || site == "" {
 			if verbose > 0 {
 				fmt.Printf("processing %+v\n", sobj)
 			}
@@ -70,28 +70,66 @@ func getMeta(site string) ([]MetaData, error) {
 	}
 	return records, nil
 }
+
+// helper function to add meta data record
+func addRecord(args []string) {
+	fmt.Printf("addRecord with %+v", args)
+}
+
+// helper function to delete meta-data record
+func deleteRecord(args []string) {
+	fmt.Printf("deleteRecord with %+v", args)
+}
+
+// helper funtion to list meta-data records
+func listRecords(site string) {
+	records, err := getMeta(site)
+	if err != nil {
+		fmt.Println("ERROR", err)
+		os.Exit(1)
+	}
+	for _, r := range records {
+		fmt.Println("---")
+		fmt.Printf("ID         : %s\n", r.ID)
+		fmt.Printf("Tags       : %v\n", r.Tags)
+		fmt.Printf("Bucket     : %v\n", r.Bucket)
+		fmt.Printf("Description: %s\n", r.Description)
+	}
+}
+
+// helper function to provide usage of meta option
+func usage() {
+	fmt.Println("orecast meta <ls|add|rm> [value]")
+}
+
 func metaCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "meta",
 		Short: "OreCast meta command",
 		Long: `OreCast meta command
 	Complete documentation is available at https://orecast.com/documentation/`,
+		Args: cobra.MinimumNArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			// Do Stuff Here
-			site := "Cornell"
-			records, err := getMeta(site)
-			if err != nil {
-				fmt.Println("ERROR", err)
-				os.Exit(1)
-			}
-			for _, r := range records {
-				fmt.Println("---")
-				fmt.Printf("ID         : %s\n", r.ID)
-				fmt.Printf("Tags       : %v\n", r.Tags)
-				fmt.Printf("Bucket     : %v\n", r.Bucket)
-				fmt.Printf("Description: %s\n", r.Description)
+			if len(args) == 0 {
+				usage()
+			} else if args[0] == "ls" {
+				if len(args) == 2 {
+					listRecords(args[1])
+				} else {
+					listRecords("")
+				}
+			} else if args[0] == "add" {
+				addRecord(args)
+			} else if args[0] == "rm" {
+				deleteRecord(args)
+			} else {
+				fmt.Printf("WARNING: unsupported option(s) %+v", args)
 			}
 		},
 	}
+	cmd.SetUsageFunc(func(*cobra.Command) error {
+		usage()
+		return nil
+	})
 	return cmd
 }
