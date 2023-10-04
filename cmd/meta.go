@@ -11,12 +11,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Response represences response from MetaData service
-type Response struct {
-	Status string `json:"status"`
-	Error  any    `json:"error,omitempty"`
-}
-
 // helper function to get metadata
 // MetaData represents MetaData object returned from discovery service
 type MetaData struct {

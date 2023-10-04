@@ -3,7 +3,9 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -50,7 +52,46 @@ func siteAddRecord(args []string) {
 
 // helper function to delete site-data record
 func siteDeleteRecord(args []string) {
-	fmt.Printf("deleteRecord with %+v", args)
+	if len(args) != 2 {
+		metaUsage()
+		os.Exit(1)
+	}
+	site := args[1]
+	token, err := accessToken()
+	if err != nil {
+		fmt.Println("ERROR", err)
+		os.Exit(1)
+	}
+	rurl := fmt.Sprintf("%s/site/%s", _oreConfig.Services.DiscoveryURL, site)
+	req, err := http.NewRequest("DELETE", rurl, nil)
+	if err != nil {
+		fmt.Println("ERROR", err)
+		os.Exit(1)
+	}
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("ERROR", err)
+		os.Exit(1)
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("ERROR", err)
+		os.Exit(1)
+	}
+	var response Response
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		fmt.Println("ERROR", err, "response body", string(body))
+		os.Exit(1)
+	}
+	if response.Status == "ok" {
+		fmt.Printf("SUCCESS: site %s was successfully removed\n", site)
+	} else {
+		fmt.Printf("WARNING: site %s failed to be removed\n", site)
+	}
 }
 
 // helper funciont to list site record(s)
