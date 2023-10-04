@@ -1,12 +1,14 @@
 package cmd
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -75,11 +77,76 @@ func getMeta(site string) ([]MetaData, error) {
 // helper function to provide usage of meta option
 func metaUsage() {
 	fmt.Println("orecast meta <ls|add|rm> [value]")
+	fmt.Println("Examples:")
+	fmt.Println("\n# list all meta data records:")
+	fmt.Println("orecast meta ls")
+	fmt.Println("\n# list specific meta-data record:")
+	fmt.Println("orecast meta ls 123xyz")
+	fmt.Println("\n# remove meta-data record:")
+	fmt.Println("orecast meta rm 123xyz")
+	fmt.Println("\n# add meta-data record:")
+	fmt.Println("orecast meta add")
 }
 
 // helper function to add meta data record
 func metaAddRecord(args []string) {
-	fmt.Printf("addRecord with %+v", args)
+	if len(args) != 1 {
+		metaUsage()
+		os.Exit(1)
+	}
+	token, err := accessToken()
+	if err != nil {
+		fmt.Println("ERROR", err)
+		os.Exit(1)
+	}
+	site := inputPrompt("Site name:")
+	description := inputPrompt("Site description:")
+	bucket := inputPrompt("Site bucket:")
+	var tags []string
+	for _, r := range strings.Split(inputPrompt("Site tags (command separated):"), ",") {
+		tags = append(tags, strings.Trim(r, " "))
+	}
+	meta := MetaData{
+		Site:        site,
+		Description: description,
+		Bucket:      bucket,
+		Tags:        tags,
+	}
+	data, err := json.Marshal(meta)
+	if err != nil {
+		fmt.Println("ERROR", err)
+		os.Exit(1)
+	}
+	rurl := fmt.Sprintf("%s/meta", _oreConfig.Services.MetaDataURL)
+	req, err := http.NewRequest("POST", rurl, bytes.NewBuffer(data))
+	if err != nil {
+		fmt.Println("ERROR", err)
+		os.Exit(1)
+	}
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("ERROR", err)
+		os.Exit(1)
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("ERROR", err)
+		os.Exit(1)
+	}
+	var response Response
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		fmt.Println("ERROR", err, "response body", string(body))
+		os.Exit(1)
+	}
+	if response.Status == "ok" {
+		fmt.Printf("SUCCESS: record %+v was successfully added\n", meta)
+	} else {
+		fmt.Printf("WARNING: record %+v failed to be added MetaData service\n", meta)
+	}
 }
 
 // helper function to delete meta-data record
