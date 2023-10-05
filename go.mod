@@ -3,8 +3,8 @@ module github.com/OreCast/client
 go 1.21.0
 
 require (
-	github.com/OreCast/common/authz v0.0.0-20231004124126-425fa159464d
-	github.com/OreCast/common/config v0.0.0-20231004124126-425fa159464d
+	github.com/OreCast/common/authz v0.0.0-20231005114436-f79d6cce30d3
+	github.com/OreCast/common/config v0.0.0-20231005114436-f79d6cce30d3
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/spf13/cobra v1.7.0
 	golang.org/x/term v0.12.0

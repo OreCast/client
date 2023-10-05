@@ -42,10 +42,14 @@ github.com/OreCast/common/authz v0.0.0-20231003150412-03ca014ec8fb h1:whoLgO3SAw
 github.com/OreCast/common/authz v0.0.0-20231003150412-03ca014ec8fb/go.mod h1:jDwwPWwkZ7e/Uzv2Xz7+3AO4uHtnrCNUq4/5hpwPTDM=
 github.com/OreCast/common/authz v0.0.0-20231004124126-425fa159464d h1:Akl62OjESS4rdUuwZidLlZWzsh9jkkdUQQoy57CN7zg=
 github.com/OreCast/common/authz v0.0.0-20231004124126-425fa159464d/go.mod h1:jDwwPWwkZ7e/Uzv2Xz7+3AO4uHtnrCNUq4/5hpwPTDM=
+github.com/OreCast/common/authz v0.0.0-20231005114436-f79d6cce30d3 h1:5Paheyv5EQB/xqmMPwkDF0e7YULQHaOH7xTOTkl0yXA=
+github.com/OreCast/common/authz v0.0.0-20231005114436-f79d6cce30d3/go.mod h1:jDwwPWwkZ7e/Uzv2Xz7+3AO4uHtnrCNUq4/5hpwPTDM=
 github.com/OreCast/common/config v0.0.0-20231003150412-03ca014ec8fb h1:oLDdu7knKHjpbxncLU+waXmMiTB+5h2KhgJAsjar4A0=
 github.com/OreCast/common/config v0.0.0-20231003150412-03ca014ec8fb/go.mod h1:DBXpsKa8GFsH7rgiRi3JZPsOhwFK6m8AOev2wySo0dc=
 github.com/OreCast/common/config v0.0.0-20231004124126-425fa159464d h1:osflpOTq9exH9NoKsDR2faClgW5oOALn+76zDbeisBY=
 github.com/OreCast/common/config v0.0.0-20231004124126-425fa159464d/go.mod h1:DBXpsKa8GFsH7rgiRi3JZPsOhwFK6m8AOev2wySo0dc=
+github.com/OreCast/common/config v0.0.0-20231005114436-f79d6cce30d3 h1:GYprGdc7SYjqKP5MXpYHlBtbThOQndJX54BMvjpSc30=
+github.com/OreCast/common/config v0.0.0-20231005114436-f79d6cce30d3/go.mod h1:DBXpsKa8GFsH7rgiRi3JZPsOhwFK6m8AOev2wySo0dc=
 github.com/bytedance/sonic v1.5.0/go.mod h1:ED5hyg4y6t3/9Ku1R6dU/4KyJ48DZ4jPhfY1O2AihPM=
 github.com/bytedance/sonic v1.9.1 h1:6iJ6NqdoxCDr6mbY8h18oSO+cShGSMRGCEo7F2h0x8s=
 github.com/bytedance/sonic v1.9.1/go.mod h1:i736AoUSYt75HyZLoJW9ERYxcy6eaN6h4BZXU064P/U=
