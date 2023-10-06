@@ -39,6 +39,7 @@ func init() {
 	rootCmd.AddCommand(dbsCommand())
 	rootCmd.AddCommand(siteCommand())
 	rootCmd.AddCommand(authCommand())
+	rootCmd.AddCommand(s3Command())
 	rootCmd.AddCommand(userCommand())
 }
 
