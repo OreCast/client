@@ -169,6 +169,7 @@ func s3Upload(args []string) {
 		defer file.Close()
 
 		// send POST request to DataManagement service with file data content
+		// see https://stackoverflow.com/questions/20205796/post-data-using-the-content-type-multipart-form-data
 		/*
 		   ```
 		    curl -X POST http://localhost:8340/storage/cornell/s3-bucket/archive.zip \
