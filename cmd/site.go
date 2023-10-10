@@ -1,11 +1,13 @@
 package cmd
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -45,25 +47,8 @@ func siteUsage() {
 	fmt.Println("orecast site <ls|add|rm> [value]")
 }
 
-// helper function to add site data record
-func siteAddRecord(args []string) {
-	fmt.Printf("addRecord with %+v", args)
-}
-
-// helper function to delete site-data record
-func siteDeleteRecord(args []string) {
-	if len(args) != 2 {
-		metaUsage()
-		os.Exit(1)
-	}
-	site := args[1]
+func makeHttpRequest(req *http.Request) {
 	token, err := accessToken()
-	if err != nil {
-		fmt.Println("ERROR", err)
-		os.Exit(1)
-	}
-	rurl := fmt.Sprintf("%s/site/%s", _oreConfig.Services.DiscoveryURL, site)
-	req, err := http.NewRequest("DELETE", rurl, nil)
 	if err != nil {
 		fmt.Println("ERROR", err)
 		os.Exit(1)
@@ -87,11 +72,63 @@ func siteDeleteRecord(args []string) {
 		fmt.Println("ERROR", err, "response body", string(body))
 		os.Exit(1)
 	}
-	if response.Status == "ok" {
-		fmt.Printf("SUCCESS: site %s was successfully removed\n", site)
-	} else {
-		fmt.Printf("WARNING: site %s failed to be removed\n", site)
+	fmt.Println("Status", response.Status)
+}
+
+// helper function to add site data record
+func siteAddRecord(args []string) {
+	// prompt for site input
+	site := inputPrompt("OreCast site name:")
+	description := inputPrompt("OreCast site description:")
+	accessKey := inputPrompt("OreCast site access key:")
+	accessSecret := inputPrompt("OreCast site access secret:")
+	sslInput := inputPrompt("OreCast site use ssl:")
+	endpoint := inputPrompt("OreCast site endpoint, e.g. localhost:8230")
+	url := inputPrompt("OreCast site URL (http://localhost:8230):")
+	useSSL := false
+	if strings.ToLower(sslInput) == "ues" {
+		useSSL = true
 	}
+
+	record := Site{
+		Name:         site,
+		Description:  description,
+		URL:          url,
+		AccessKey:    accessKey,
+		AccessSecret: accessSecret,
+		UseSSL:       useSSL,
+		Endpoint:     endpoint,
+	}
+	data, err := json.Marshal(record)
+	if err != nil {
+		fmt.Println("ERROR", err)
+		os.Exit(1)
+	}
+
+	// make POST request to discovery service
+	rurl := fmt.Sprintf("%s/site", _oreConfig.Services.DiscoveryURL)
+	req, err := http.NewRequest("POST", rurl, bytes.NewBuffer(data))
+	if err != nil {
+		fmt.Println("ERROR", err)
+		os.Exit(1)
+	}
+	makeHttpRequest(req)
+}
+
+// helper function to delete site-data record
+func siteDeleteRecord(args []string) {
+	if len(args) != 2 {
+		metaUsage()
+		os.Exit(1)
+	}
+	site := args[1]
+	rurl := fmt.Sprintf("%s/site/%s", _oreConfig.Services.DiscoveryURL, site)
+	req, err := http.NewRequest("DELETE", rurl, nil)
+	if err != nil {
+		fmt.Println("ERROR", err)
+		os.Exit(1)
+	}
+	makeHttpRequest(req)
 }
 
 // helper funciont to list site record(s)
