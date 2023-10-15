@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -38,13 +37,13 @@ func metadata(site string) MetaDataRecord {
 	}
 	resp, err := http.Get(rurl)
 	if err != nil {
-		log.Println("ERROR:", err)
+		fmt.Println("ERROR:", err)
 		return results
 	}
 	defer resp.Body.Close()
 	dec := json.NewDecoder(resp.Body)
 	if err := dec.Decode(&results); err != nil {
-		log.Println("ERROR:", err)
+		fmt.Println("ERROR:", err)
 		return results
 	}
 	return results
